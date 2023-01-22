@@ -1,4 +1,4 @@
-#include "raylib.h"
+﻿#include "raylib.h"
 #include <cstdint>
 #include <string>
 const static int s_paddle_padding = 30;
@@ -34,25 +34,29 @@ public:
 
 	float getHeight()const { return m_height; }
 
-	void move(Paddle &left_paddle, Paddle &right_paddle)
+	void move(Paddle &left_paddle, Paddle &right_paddle, bool &tutorial_left, bool &tutorial_right)
 	{
 		if (IsKeyDown(KEY_W))
 		{
+			tutorial_left = 1;
 			left_paddle.m_y -= m_speed * GetFrameTime();
 		}
 
 		if (IsKeyDown(KEY_S))
 		{
+			tutorial_left = 1;
 			left_paddle.m_y += m_speed * GetFrameTime();
 		}
 
 		if (IsKeyDown(KEY_UP))
 		{
+			tutorial_right = 1;
 			right_paddle.m_y -= m_speed * GetFrameTime();
 		}
 
 		if (IsKeyDown(KEY_DOWN))
 		{
+			tutorial_right = 1;
 			right_paddle.m_y += m_speed * GetFrameTime();
 		}
 
@@ -69,7 +73,7 @@ private:
 	float m_radius;
 	Color m_color;
 public:
-	Ball(float x, float y, float speed_x, float speed_y, float radius, Color color)
+	Ball(float x = GetScreenWidth() / 2.0f, float y = GetScreenHeight() / 2.0f, float speed_x = 150, float speed_y = 260, float radius = 5, Color color = ORANGE)
 		: m_x{x}, m_y{y}, m_speed_x{speed_x}, m_speed_y{speed_y}, m_radius{radius}, m_color{color}
 	{
 
@@ -93,12 +97,14 @@ public:
 
 		if (m_y < 0)
 		{
+			m_y = 0;
 			PlaySound(kick);
 			m_speed_y *= -1.0f;
 		}
 			
 		if (m_y > GetScreenHeight())
 		{
+			m_y = GetScreenHeight();
 			PlaySound(kick);
 			m_speed_y *= -1.0f;
 		}
@@ -129,8 +135,8 @@ public:
 			if (m_speed_x < 0)
 			{
 				PlaySound(kick);
-				m_speed_x *= -1.2f;
-				m_speed_y = (m_y - left_paddle.getY()) / (left_paddle.getHeight() / 3) * m_speed_x;
+				m_speed_x *= -1.1f;
+				m_speed_y = (m_y - left_paddle.getY()) / (left_paddle.getHeight() / 2) * m_speed_x;
 			}
 			
 		}
@@ -140,15 +146,17 @@ public:
 			if (m_speed_x > 0)
 			{
 				PlaySound(kick);
-				m_speed_x *= -1.2f;
-				m_speed_y = (m_y - right_paddle.getY()) / (right_paddle.getHeight() / 3) * - m_speed_x;
+				m_speed_x *= -1.1f;
+				m_speed_y = (m_y - right_paddle.getY()) / (right_paddle.getHeight() / 2) * - m_speed_x;
 			}
 		}
 	}
 
-	void restart() 
+	void restart(Paddle &left_paddle, Paddle &right_paddle) 
 	{ 
-		*this = Ball{ GetScreenWidth() / 2.0f , GetScreenHeight() / 2.0f, 50, 200, 5, ORANGE };
+		*this = Ball{};
+		left_paddle = Paddle{ s_paddle_padding, GetScreenHeight() / 2.0f, 200, 10, 100, BLUE };
+		right_paddle = Paddle{ GetScreenWidth() * 1.0f - s_paddle_padding, GetScreenHeight() / 2.0f, 200, 10, 100, BLUE };
 		text = nullptr;
 	}
 
@@ -174,6 +182,14 @@ void startText(bool s)
 }
 	
 
+void tutorial(bool tutorial_left, bool tutorial_right)
+{
+	if (!tutorial_left)
+		DrawText("W\nS", 30, GetScreenHeight() - 80, 20, GRAY);
+	if (!tutorial_right)
+		DrawText("UP\nDOWN", GetScreenWidth() - 80, GetScreenHeight() - 80, 20, GRAY);
+}
+
 int main()
 {
 	#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
@@ -183,10 +199,12 @@ int main()
 
 	SetWindowState(FLAG_VSYNC_HINT);
 
-	Ball ball{ GetScreenWidth() / 2.0f , GetScreenHeight() / 2.0f, 100, 200, 5, ORANGE };
+	Ball ball{};
 	Paddle leftPaddle{ s_paddle_padding, GetScreenHeight() / 2.0f, 200, 10, 100, BLUE };
 	Paddle rightPaddle{ GetScreenWidth() * 1.0f - s_paddle_padding, GetScreenHeight() / 2.0f, 200, 10, 100, BLUE };
 	
+	bool tutorial_left = 0;
+	bool tutorial_right = 0;
 	bool start = 0;
 
 	while (!WindowShouldClose())
@@ -197,7 +215,7 @@ int main()
 		if (start)
 		{
 			
-			leftPaddle.move(leftPaddle, rightPaddle);
+			leftPaddle.move(leftPaddle, rightPaddle, tutorial_left, tutorial_right);
 			ball.move();
 			ball.isColliding(leftPaddle, rightPaddle);
 			scoreDraw(ball);
@@ -209,7 +227,7 @@ int main()
 		
 
 		if (IsKeyPressed(KEY_SPACE) && text != nullptr)
-			ball.restart();
+			ball.restart(leftPaddle, rightPaddle);
 
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -218,7 +236,7 @@ int main()
 		startText(start);
 		DrawText("Press Esc To Exit", 0, 10, 20, DARKGRAY);
 		ball.draw();
-		
+		tutorial(tutorial_left, tutorial_right);
 
 		leftPaddle.draw();
 		rightPaddle.draw();
