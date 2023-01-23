@@ -5,7 +5,6 @@ const static int s_paddle_padding = 30;
 //static const char* text;
 bool b_restart = true;
 
-Sound kick; 
 uint16_t left_player = 0;
 uint16_t right_player = 0;
 
@@ -63,8 +62,18 @@ public:
 
 	float getHeight()const { return m_height; }
 
+	void blockBorders()
+	{
+		if (m_y - m_height / 2 < 0)
+			m_y = m_height / 2;
+		if (m_y + m_height / 2 > GetScreenHeight())
+			m_y = GetScreenHeight() - m_height / 2;
+	}
+
 	void move(Paddle &left_paddle, Paddle &right_paddle, bool &tutorial_left, bool &tutorial_right)
 	{
+		
+
 		if (IsKeyDown(KEY_W))
 		{
 			tutorial_left = 1;
@@ -128,14 +137,12 @@ public:
 		if (m_y < 0)
 		{
 			m_y = 0;
-			PlaySound(kick);
 			m_speed_y *= -1.0f;
 		}
 			
 		if (m_y > GetScreenHeight())
 		{
 			m_y = GetScreenHeight();
-			PlaySound(kick);
 			m_speed_y *= -1.0f;
 		}
 			
@@ -164,7 +171,6 @@ public:
 		{
 			if (m_speed_x < 0)
 			{
-				PlaySound(kick);
 				m_speed_x *= -1.1f;
 				m_speed_y = (m_y - left_paddle.getY()) / (left_paddle.getHeight() / 2) * m_speed_x;
 			}
@@ -175,7 +181,6 @@ public:
 		{
 			if (m_speed_x > 0)
 			{
-				PlaySound(kick);
 				m_speed_x *= -1.1f;
 				m_speed_y = (m_y - right_paddle.getY()) / (right_paddle.getHeight() / 2) * - m_speed_x;
 			}
@@ -228,8 +233,6 @@ int main()
 {
 	#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 	InitWindow(800, 600, "Pong");
-	InitAudioDevice();
-	kick = LoadSound("Self_Pong\Self_Pong\kick.wav");
 
 	SetWindowState(FLAG_VSYNC_HINT);
 
@@ -263,6 +266,8 @@ int main()
 		{
 			
 			leftPaddle.move(leftPaddle, rightPaddle, tutorial_left, tutorial_right);
+			leftPaddle.blockBorders();
+			rightPaddle.blockBorders();
 			ball.move();
 			ball.isColliding(leftPaddle, rightPaddle);
 			scoreDraw(ball);
@@ -295,8 +300,6 @@ int main()
 		EndDrawing();
 	}
 
-	UnloadSound(kick);
-	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;
