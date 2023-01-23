@@ -5,14 +5,14 @@ const static int s_paddle_padding = 30;
 //static const char* text;
 bool b_restart = true;
 
-uint16_t left_player = 0;
-uint16_t right_player = 0;
+uint8_t left_player = 0;
+uint8_t right_player = 0;
 
-uint16_t ball_color = 0;
-uint16_t paddle_color = 9;
-uint16_t background_color = 0;
+uint8_t ball_color = 0;
+uint8_t paddle_color = 9;
+uint8_t background_color = 0;
 
-const uint16_t max_colors = 14u;
+const uint8_t max_colors = 14u;
 const Color colors[max_colors]
 {
 	{ 253, 249, 0, 255 }, { 255, 203, 0, 255 },
@@ -23,14 +23,14 @@ const Color colors[max_colors]
 	{ 200, 122, 255, 255 }, { 135, 60, 190, 255 },
 	{ 127, 106, 79, 255 }, { 255, 0, 255, 255 }
 };
-const uint16_t background_max = 4;
+const uint8_t background_max = 4;
 
 const Color backgroundColors[background_max]
 {
 	WHITE, BLACK, BEIGE, {0, 255, 255, 1}
 };
 
-Color colorChanger(uint16_t count, const Color colors[])
+Color colorChanger(uint8_t count, const Color colors[])
 {
 	return colors[count];
 }
@@ -187,7 +187,7 @@ public:
 		}
 	}
 
-	void restart(Paddle &left_paddle, Paddle &right_paddle, uint16_t &ball_color, uint16_t &paddle_color) 
+	void restart(Paddle &left_paddle, Paddle &right_paddle, uint8_t &ball_color, uint8_t &paddle_color) 
 	{ 
 		++ball_color;
 		++paddle_color;
