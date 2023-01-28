@@ -23,11 +23,13 @@ const Color colors[max_colors]
 	{ 200, 122, 255, 255 }, { 135, 60, 190, 255 },
 	{ 127, 106, 79, 255 }, { 255, 0, 255, 255 }
 };
-const uint8_t background_max = 4;
+const uint8_t background_max = 9;
 
 const Color backgroundColors[background_max]
 {
-	WHITE, BLACK, BEIGE, {0, 255, 255, 1}
+	WHITE, BLACK, {248, 248, 255, 1}, 
+	{245, 245, 245, 1}, {254, 254, 250, 1},
+	{12, 4, 4, 0}, {61, 12, 2, 0}, {73, 79, 85, 0}, {102, 99, 98, 0}
 };
 
 Color colorChanger(uint8_t count, const Color colors[])
@@ -99,6 +101,8 @@ public:
 		}
 
 	}
+
+
 };
 
 class Ball
@@ -271,6 +275,7 @@ int main()
 			ball.move();
 			ball.isColliding(leftPaddle, rightPaddle);
 			scoreDraw(ball);
+
 			if (ball.getX() < 0 || ball.getX() > GetScreenWidth())
 				b_restart = false;
 		}
@@ -288,7 +293,6 @@ int main()
 		BeginDrawing();
 		ClearBackground(colorChanger(background_color, backgroundColors));
 		
-
 		startText(start);
 		DrawText("Press Esc To Exit", 0, 10, 20, DARKGRAY);
 		ball.draw();
