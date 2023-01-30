@@ -5,6 +5,9 @@ const static int s_paddle_padding = 30;
 //static const char* text;
 bool b_restart = true;
 
+Sound kick;
+Sound paddle_kick;
+
 uint8_t left_player = 0;
 uint8_t right_player = 0;
 
@@ -140,12 +143,14 @@ public:
 
 		if (m_y < 0)
 		{
+			PlaySound(kick);
 			m_y = 0;
 			m_speed_y *= -1.0f;
 		}
 			
 		if (m_y > GetScreenHeight())
 		{
+			PlaySound(kick);
 			m_y = GetScreenHeight();
 			m_speed_y *= -1.0f;
 		}
@@ -173,6 +178,7 @@ public:
 	{
 		if (CheckCollisionCircleRec(getVector(), m_radius, left_paddle.getRec()))
 		{
+			PlaySound(paddle_kick);
 			if (m_speed_x < 0)
 			{
 				m_speed_x *= -1.1f;
@@ -183,6 +189,7 @@ public:
 			
 		if (CheckCollisionCircleRec(getVector(), m_radius, right_paddle.getRec()))
 		{
+			PlaySound(paddle_kick);
 			if (m_speed_x > 0)
 			{
 				m_speed_x *= -1.1f;
@@ -235,12 +242,13 @@ void tutorial(bool tutorial_left, bool tutorial_right)
 
 int main()
 {
-	#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+	
 	InitWindow(800, 600, "Pong");
-
+	InitAudioDevice();
 	SetWindowState(FLAG_VSYNC_HINT);
 
-	
+	kick = LoadSound("resources/kick.ogg");
+	paddle_kick = LoadSound("resources/paddle_kick.ogg");
 
 	Ball ball{};
 	Paddle leftPaddle{ s_paddle_padding, GetScreenHeight() / 2.0f, 200, 10, 100};
@@ -268,7 +276,6 @@ int main()
 
 		if (start)
 		{
-			
 			leftPaddle.move(leftPaddle, rightPaddle, tutorial_left, tutorial_right);
 			leftPaddle.blockBorders();
 			rightPaddle.blockBorders();
@@ -303,7 +310,7 @@ int main()
 
 		EndDrawing();
 	}
-
+	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;
